@@ -176,7 +176,7 @@ impl PbDeserializer {
             nested_msg_mapping.clone(),
             &skip_fields,
         )
-        .expect("Failed to transfer output scheam to pb scheam");
+        .expect("Failed to transfer output schema to pb schema");
 
         let tag_to_output_mapping =
             create_tag_to_output_mapping(message_descriptor.clone(), &pb_schema);
@@ -287,8 +287,8 @@ fn transfer_output_schema_to_pb_schema(
                 let msg_field_desc =
                     message_descriptor
                         .get_field_by_name(msg_field_name)
-                        .expect(&format!(
-                            "nested field {msg_field_name} not exits in message_descriptor"
+                        .unwrap_or_else(|| panic!(
+                            "nested field {msg_field_name} not exists in message_descriptor"
                         ));
                 if let Kind::Message(sub_message_desc) = msg_field_desc.kind() {
                     if !msg_set.contains(msg_field_name) {
@@ -321,15 +321,15 @@ fn transfer_output_schema_to_pb_schema(
                 let msg_field_desc =
                     message_descriptor
                         .get_field_by_name(field_name)
-                        .expect(&format!(
-                            "nested innermost field {field_name} not exits in message_descriptor"
+                        .unwrap_or_else(|| panic!(
+                            "nested innermost field {field_name} not exists in message_descriptor"
                         ));
                 pb_schema_fields.push(create_arrow_field(msg_field_desc.clone(), skip_fields));
             }
         } else {
             let msg_field_desc = message_descriptor
                 .get_field_by_name(field.name())
-                .expect(&format!("{} not exits in message_descriptor", field.name()));
+                .unwrap_or_else(|| panic!("{} not exists in message_descriptor", field.name()));
             pb_schema_fields.push(create_arrow_field(msg_field_desc.clone(), skip_fields));
         }
     }
@@ -549,8 +549,8 @@ fn create_output_array_builders(
         let field_name = field.name();
         let field_desc = message_descriptor
             .get_field_by_name(field_name)
-            .expect(&format!(
-                "Field {field_name} not exits in message_descriptor",
+            .unwrap_or_else(|| panic!(
+                "Field {field_name} not exists in message_descriptor",
             ));
         match field.data_type() {
             DataType::Boolean => {

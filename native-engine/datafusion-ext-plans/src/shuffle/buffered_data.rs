@@ -301,7 +301,7 @@ fn sort_batches_by_partition_id(
                 Partitioning::HashPartitioning(..) => {
                     // compute partition indices
                     let hashes = evaluate_hashes(partitioning, &batch)
-                        .expect(&format!("error evaluating hashes with {partitioning}"));
+                        .unwrap_or_else(|_| panic!("error evaluating hashes with {partitioning}"));
                     evaluate_partition_ids(hashes, partitioning.partition_count())
                 }
                 Partitioning::RoundRobinPartitioning(..) => {
